@@ -1,0 +1,18 @@
+/* Neon colors */
+.text-neon-pink { color: #ff00ff; text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff; }
+.text-neon-green { color: #00ff00; text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; }
+.text-neon-blue { color: #00ffff; text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; }
+.text-neon-yellow { color: #ffff00; text-shadow: 0 0 5px #ffff00, 0 0 10px #ffff00; }
+
+/* Glowing buttons */
+.glow { box-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor; }
+
+/* Flip cards */
+.card { perspective: 1000px; }
+.card-inner { transition: transform 0.6s; transform-style: preserve-3d; cursor: pointer; }
+.card:hover .card-inner { transform: rotateY(180deg); }
+.card-front, .card-back {
+  backface-visibility: hidden;
+  position: relative;
+}
+.card-back { transform: rotateY(180deg); }
