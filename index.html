@@ -41,10 +41,12 @@
   </header>
 
   <main class="max-w-5xl mx-auto px-6 py-8">
+
+    <!-- Main Game Section -->
     <section class="grid md:grid-cols-2 gap-6 items-start">
       <div class="bg-[#070712] p-6 rounded-xl shadow-lg">
         <h2 class="text-xl font-bold" style="color:var(--neon-pink)">Motivation vs Opportunity</h2>
-        <p class="text-sm mt-2" style="color:var(--muted)">Every round you face a decision: play honestly or try to cheat for bigger reward. Motivation (desire for reward) meets opportunity (ease to cheat).</p>
+        <p class="text-sm mt-2" style="color:var(--muted)">Decide to play honestly or cheat for higher rewards.</p>
 
         <div class="mt-6 grid grid-cols-3 gap-3 justify-between items-center">
           <div class="reel" id="reel1">—</div>
@@ -59,6 +61,7 @@
         </div>
       </div>
 
+      <!-- Controls Section -->
       <aside class="bg-[#070712] p-6 rounded-xl shadow-lg">
         <h3 class="text-lg font-semibold" style="color:var(--neon-cyan)">Controls</h3>
         <div class="mt-3">
@@ -76,20 +79,15 @@
       </aside>
     </section>
 
+    <!-- All-In Wager Section -->
     <section class="mt-8 bg-[#070712] p-6 rounded-xl shadow-lg">
-      <h3 class="text-lg font-semibold" style="color:var(--neon-yellow)">Stats</h3>
-      <div class="mt-4 grid md:grid-cols-2 gap-6">
-        <div>
-          <p class="text-sm text-muted">Rounds: <strong id="rounds">0</strong></p>
-          <p class="text-sm text-muted">Cheat Attempts: <strong id="cheats">0</strong></p>
-          <p class="text-sm text-muted">Detections: <strong id="detections">0</strong></p>
-          <p class="text-sm text-muted">Average Payout: <strong id="avgPayout">0.00</strong>x</p>
-        </div>
-        <div>
-          <canvas id="outcomeChart" style="max-height:220px"></canvas>
-        </div>
+      <h3 class="text-lg font-semibold" style="color:var(--neon-yellow)">All-In Wager</h3>
+      <p class="text-sm text-muted mt-2">Risk all your current credits for a chance to double them or lose everything!</p>
+      <div class="mt-4 flex gap-3">
+        <button id="allInBtn" class="btn-main glow" style="background:linear-gradient(90deg,var(--neon-yellow),var(--neon-green));">WAGER ALL CREDITS</button>
       </div>
     </section>
+
   </main>
 
   <script>
@@ -104,12 +102,9 @@
     const playBtn=document.getElementById('playBtn');
     const cheatBtn=document.getElementById('cheatBtn');
     const resetBtn=document.getElementById('resetBtn');
+    const allInBtn=document.getElementById('allInBtn');
     const riskRange=document.getElementById('riskRange');
     const guardSel=document.getElementById('guardSel');
-
-    const ctx=document.getElementById('outcomeChart').getContext('2d');
-    const chartData={labels:['Honest Wins','Cheat Successful','Cheat Detected'],datasets:[{label:'Rounds',data:[0,0,0],backgroundColor:['#00f0ff','#22ff7a','#ff3ca6']}]};
-    const outcomeChart=new Chart(ctx,{type:'doughnut',data:chartData,options:{plugins:{legend:{labels:{color:'#e6eef8'}}}}});
 
     function randomSymbol(){const syms=['★','♠','◆','♥','7'];return syms[Math.floor(Math.random()*syms.length)];}
     function spinReels(){for(let i=0;i<3;i++){reels[i].textContent=randomSymbol();}}
@@ -136,57 +131,24 @@
       setTimeout(()=>{span.remove();},700);
     }
 
-    function updateStats(){
-      roundsEl.textContent=state.rounds;
-      cheatsEl.textContent=state.cheats;
-      detectionsEl.textContent=state.detections;
-      avgPayoutEl.textContent=(state.rounds?(state.totalPayout/state.rounds).toFixed(2):'0.00');
-      outcomeChart.data.datasets[0].data=[Math.max(0,state.rounds-state.cheats),Math.max(0,state.cheats-state.detections),state.detections];
-      outcomeChart.update();
+    function updateCreditDisplay(){
       creditDisplay.textContent = `Credits: ${credits}`;
     }
 
-    function simulateRound({attemptCheat=false}){
-      const spins=10;let i=0;
-      const spinInterval=setInterval(()=>{spinReels();i++;if(i>=spins) clearInterval(spinInterval);},60);
+    allInBtn.addEventListener('click',()=>{
+      if(credits<=0) return alert('No credits to wager!');
+      spinReels();
       setTimeout(()=>{
-        state.rounds+=1;
-        const basePayout=1;
-        if(!attemptCheat){
-          const payout=Math.floor(basePayout*(1+(Math.random()*0.6-0.2))*10);
-          credits += payout;
-          state.totalPayout += payout/10;
-          triggerCoins();
-          showCreditChange(payout);
-        } else {
-          state.cheats+=1;
-          const risk=Number(riskRange.value)/100;
-          const guard=Number(guardSel.value);
-          const detectProb=Math.min(0.98,Math.max(0.01,risk*(1-guard)+(Math.random()*0.12-0.06)));
-          const success=Math.random()>detectProb;
-          if(success){
-            const multiplier=1.5+(risk*2.5)+(Math.random()*0.3-0.15);
-            const payout=Math.floor(basePayout*multiplier*10);
-            credits += payout;
-            state.totalPayout += payout/10;
-            triggerCoins();
-            showCreditChange(payout);
-          } else {
-            const loss = 5;
-            credits -= loss;
-            state.detections+=1;
-            state.totalPayout += -loss/10;
-            showCreditChange(-loss);
-          }
-        }
-        updateStats();
-      },spins*60+120);
-    }
+        const win = Math.random()<0.5;
+        const change = win ? credits : -credits;
+        credits += change;
+        triggerCoins();
+        showCreditChange(change);
+        updateCreditDisplay();
+      }, 800);
+    });
 
-    playBtn.addEventListener('click',()=>{simulateRound({attemptCheat:false});});
-    cheatBtn.addEventListener('click',()=>{simulateRound({attemptCheat:true});});
-    resetBtn.addEventListener('click',()=>{state.rounds=0;state.cheats=0;state.detections=0;state.totalPayout=0;credits=100;updateStats();});
-    updateStats();
+    updateCreditDisplay();
   </script>
 </body>
 </html>
