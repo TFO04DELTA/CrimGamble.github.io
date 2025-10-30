@@ -4,13 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>CrimGamble — Opportunity Theory Simulation</title>
-  <meta name="description" content="Educational simulation: an interactive game illustrating Opportunity Theory through motivation and opportunity dynamics."/>
+  <meta name="description" content="Interactive simulation illustrating Opportunity Theory with flashy casino-style animations for wins and losses."/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     :root{--bg:#030309;--card:#0b0b10;--muted:#94a3b8;--neon-pink:#ff3ca6;--neon-cyan:#00f0ff;--neon-green:#22ff7a;--neon-yellow:#ffd24a}
-    body{background:linear-gradient(180deg,#02020a 0%, #070712 70%); color:#e6eef8; font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial}
+    body{background:linear-gradient(180deg,#02020a 0%, #070712 70%); color:#e6eef8; font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial; overflow-x:hidden}
     .neon{filter:drop-shadow(0 0 6px rgba(255,56,166,.25))}
     header{border-bottom:1px solid rgba(255,255,255,0.04)}
     .glow{box-shadow:0 0 10px rgba(255,56,166,.18),0 0 30px rgba(0,240,255,.06)}
@@ -24,18 +24,19 @@
     .card-front,.card-back{backface-visibility:hidden;position:relative}
     .card-back{transform:rotateY(180deg)}
     footer{border-top:1px solid rgba(255,255,255,0.03);margin-top:36px}
+    .credit-display{position:fixed;top:20px;right:20px;background:rgba(0,0,0,0.5);padding:12px 20px;border-radius:20px;font-weight:700;z-index:1000;pointer-events:none;}
+    .credit-up{animation:popUp 0.7s forwards;color:#22ff7a;}
+    .credit-down{animation:popUp 0.7s forwards;color:#ff3ca6;}
+    @keyframes popUp{0%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:1}100%{transform:scale(1);opacity:0}}
     @media (max-width:700px){.reel{width:90px;height:90px;font-size:18px}}
   </style>
 </head>
 <body>
+  <div id="creditDisplay" class="credit-display">Credits: 100</div>
   <header class="px-6 py-4 flex items-center justify-between">
     <div>
       <h1 class="text-2xl font-extrabold" style="color:var(--neon-cyan)">CrimGamble <span style="color:var(--neon-pink);font-weight:600">— Opportunity Theory Lab</span></h1>
-      <p class="text-sm text-muted" style="color:var(--muted)">Yeah, Opportunity Theory says that people commit crime based on <strong>motivation</strong> and <strong>opportunity</strong>. This simulation models that balance using a casino-style interface.</p>
-    </div>
-    <div class="flex gap-3 items-center">
-      <div class="pill text-sm">Mode: <strong class="ml-2">Opportunity Simulation</strong></div>
-      <a href="#about" class="btn-ghost text-sm ml-2">About</a>
+      <p class="text-sm text-muted" style="color:var(--muted)">Simulation shows how <strong>motivation</strong> and <strong>opportunity</strong> influence choices, with flashy animations for wins and losses.</p>
     </div>
   </header>
 
@@ -43,7 +44,7 @@
     <section class="grid md:grid-cols-2 gap-6 items-start">
       <div class="bg-[#070712] p-6 rounded-xl shadow-lg">
         <h2 class="text-xl font-bold" style="color:var(--neon-pink)">Motivation vs Opportunity</h2>
-        <p class="text-sm mt-2" style="color:var(--muted)">Every round you face a decision: play honestly or try to cheat for more reward. Motivation (your desire for reward) meets opportunity (how easy it is to cheat). The simulation demonstrates how both influence behavior, echoing Opportunity Theory’s central idea.</p>
+        <p class="text-sm mt-2" style="color:var(--muted)">Every round you face a decision: play honestly or try to cheat for bigger reward. Motivation (desire for reward) meets opportunity (ease to cheat).</p>
 
         <div class="mt-6 grid grid-cols-3 gap-3 justify-between items-center">
           <div class="reel" id="reel1">—</div>
@@ -56,22 +57,14 @@
           <button id="cheatBtn" class="btn-main" style="background:linear-gradient(90deg,var(--neon-green),var(--neon-yellow));">Attempt Cheat</button>
           <button id="resetBtn" class="btn-ghost">Reset Stats</button>
         </div>
-
-        <div class="mt-4 text-sm text-slate-300">
-          <p><strong>Motivation:</strong> Higher payouts tempt players to take risks.</p>
-          <p><strong>Opportunity:</strong> Fewer guards or higher risk settings increase the chance to cheat successfully.</p>
-          <p class="mt-2">Opportunity Theory in action: when motivation is high and opportunity exists, rule-breaking becomes more likely.</p>
-        </div>
       </div>
 
       <aside class="bg-[#070712] p-6 rounded-xl shadow-lg">
-        <h3 class="text-lg font-semibold" style="color:var(--neon-cyan)">Simulation Controls</h3>
+        <h3 class="text-lg font-semibold" style="color:var(--neon-cyan)">Controls</h3>
         <div class="mt-3">
           <label class="block text-sm text-muted">Motivation Level (Cheat Risk)</label>
           <input id="riskRange" type="range" min="0" max="100" value="40" class="w-full mt-2" />
-          <div class="flex justify-between text-xs text-muted mt-1"><span>Low motivation</span><span>High motivation</span></div>
         </div>
-
         <div class="mt-4">
           <label class="block text-sm text-muted">Opportunity Level (Guard Presence)</label>
           <select id="guardSel" class="w-full mt-2 bg-transparent border border-white/5 rounded-md p-2">
@@ -80,64 +73,28 @@
             <option value="0.8" selected>Strong guardians / low opportunity</option>
           </select>
         </div>
-
-        <div class="mt-4">
-          <h4 class="text-sm font-medium">How it works</h4>
-          <p class="text-sm text-muted">If motivation outweighs guardianship (high risk and low oversight), players are more likely to cheat. When strong guardians are present, opportunity decreases and cheating is less likely to succeed.</p>
-        </div>
       </aside>
     </section>
 
     <section class="mt-8 bg-[#070712] p-6 rounded-xl shadow-lg">
-      <h3 class="text-lg font-semibold" style="color:var(--neon-yellow)">Simulation Results</h3>
+      <h3 class="text-lg font-semibold" style="color:var(--neon-yellow)">Stats</h3>
       <div class="mt-4 grid md:grid-cols-2 gap-6">
         <div>
-          <p class="text-sm text-muted">Rounds played: <strong id="rounds">0</strong></p>
-          <p class="text-sm text-muted">Cheat attempts: <strong id="cheats">0</strong></p>
+          <p class="text-sm text-muted">Rounds: <strong id="rounds">0</strong></p>
+          <p class="text-sm text-muted">Cheat Attempts: <strong id="cheats">0</strong></p>
           <p class="text-sm text-muted">Detections: <strong id="detections">0</strong></p>
-          <p class="text-sm text-muted">Average payout multiplier: <strong id="avgPayout">0.00</strong>x</p>
+          <p class="text-sm text-muted">Average Payout: <strong id="avgPayout">0.00</strong>x</p>
         </div>
         <div>
           <canvas id="outcomeChart" style="max-height:220px"></canvas>
         </div>
       </div>
-      <p class="text-xs text-muted mt-3">This simulation illustrates that when both <strong>motivation</strong> and <strong>opportunity</strong> are high, unethical choices become more likely — the core of Opportunity Theory.</p>
     </section>
-
-    <section id="about" class="mt-8 grid md:grid-cols-2 gap-6">
-      <div class="card bg-[#070712] p-6 rounded-xl shadow-lg">
-        <div class="card-inner">
-          <div class="card-front p-4">
-            <h4 class="text-lg font-semibold" style="color:var(--neon-green)">Opportunity Theory</h4>
-            <p class="text-sm text-muted mt-2">People commit crime based on a mix of their motivation and the opportunities available. Remove opportunity or lower motivation, and crime becomes less likely.</p>
-          </div>
-          <div class="card-back p-4">
-            <h4 class="text-lg font-semibold" style="color:var(--neon-pink)">How this game maps to theory</h4>
-            <ul class="text-sm text-muted mt-2 list-disc ml-4">
-              <li><strong>Motivated actor:</strong> The player, driven by potential reward.</li>
-              <li><strong>Opportunity:</strong> Lower guard presence increases success chance.</li>
-              <li><strong>Guardians:</strong> Stronger oversight decreases opportunity for wrongdoing.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <div class="bg-[#070712] p-6 rounded-xl shadow-lg">
-        <h4 class="text-lg font-semibold" style="color:var(--neon-cyan)">Discussion prompts</h4>
-        <ol class="text-sm text-muted ml-4 list-decimal mt-2">
-          <li>How does balancing motivation and opportunity change behavior?</li>
-          <li>Can increasing guardianship eliminate cheating entirely?</li>
-          <li>What parallels exist between this simulation and real-world crime prevention?</li>
-        </ol>
-      </div>
-    </section>
-
-    <footer class="mt-8 p-6 text-xs text-muted">
-      <strong>Ethics:</strong> This simulation is for educational use only. It models theoretical principles and does not provide real-world methods for cheating or criminal activity.
-    </footer>
   </main>
 
   <script>
+    let credits = 100;
+    const creditDisplay = document.getElementById('creditDisplay');
     const state={rounds:0,cheats:0,detections:0,totalPayout:0};
     const reels=[document.getElementById('reel1'),document.getElementById('reel2'),document.getElementById('reel3')];
     const roundsEl=document.getElementById('rounds');
@@ -160,13 +117,23 @@
     function triggerCoins(){
       const duration=1500;
       const animationEnd=Date.now()+duration;
-      const defaults={startVelocity:30,spread:360,ticks:60,zIndex:1000,shapes:['circle'],colors:['#FFD700','#FFAA00','#FFFF00']};
+      const defaults={startVelocity:40,spread:360,ticks:60,zIndex:1000,shapes:['circle'],colors:['#FFD700','#FFAA00','#FFFF00']};
       const interval=setInterval(()=>{
         const timeLeft=animationEnd-Date.now();
         if(timeLeft<=0) return clearInterval(interval);
-        const particleCount=5+Math.random()*10;
+        const particleCount=8+Math.random()*12;
         confetti(Object.assign({},defaults,{particleCount,origin:{x:Math.random(),y:Math.random()*0.2}}));
-      },100);
+      },50);
+    }
+
+    function showCreditChange(amount){
+      const span = document.createElement('span');
+      span.textContent = (amount>0?`+${amount}`:`${amount}`);
+      span.className = `credit-display ${amount>0?'credit-up':'credit-down'}`;
+      document.body.appendChild(span);
+      span.style.top = '50px';
+      span.style.right = '50px';
+      setTimeout(()=>{span.remove();},700);
     }
 
     function updateStats(){
@@ -176,6 +143,7 @@
       avgPayoutEl.textContent=(state.rounds?(state.totalPayout/state.rounds).toFixed(2):'0.00');
       outcomeChart.data.datasets[0].data=[Math.max(0,state.rounds-state.cheats),Math.max(0,state.cheats-state.detections),state.detections];
       outcomeChart.update();
+      creditDisplay.textContent = `Credits: ${credits}`;
     }
 
     function simulateRound({attemptCheat=false}){
@@ -185,9 +153,11 @@
         state.rounds+=1;
         const basePayout=1;
         if(!attemptCheat){
-          const payout=basePayout*(1+(Math.random()*0.6-0.2));
-          state.totalPayout+=payout;
+          const payout=Math.floor(basePayout*(1+(Math.random()*0.6-0.2))*10);
+          credits += payout;
+          state.totalPayout += payout/10;
           triggerCoins();
+          showCreditChange(payout);
         } else {
           state.cheats+=1;
           const risk=Number(riskRange.value)/100;
@@ -196,9 +166,18 @@
           const success=Math.random()>detectProb;
           if(success){
             const multiplier=1.5+(risk*2.5)+(Math.random()*0.3-0.15);
-            state.totalPayout+=basePayout*multiplier;
+            const payout=Math.floor(basePayout*multiplier*10);
+            credits += payout;
+            state.totalPayout += payout/10;
             triggerCoins();
-          } else {state.detections+=1;state.totalPayout+=-0.5;}
+            showCreditChange(payout);
+          } else {
+            const loss = 5;
+            credits -= loss;
+            state.detections+=1;
+            state.totalPayout += -loss/10;
+            showCreditChange(-loss);
+          }
         }
         updateStats();
       },spins*60+120);
@@ -206,7 +185,7 @@
 
     playBtn.addEventListener('click',()=>{simulateRound({attemptCheat:false});});
     cheatBtn.addEventListener('click',()=>{simulateRound({attemptCheat:true});});
-    resetBtn.addEventListener('click',()=>{state.rounds=0;state.cheats=0;state.detections=0;state.totalPayout=0;updateStats();});
+    resetBtn.addEventListener('click',()=>{state.rounds=0;state.cheats=0;state.detections=0;state.totalPayout=0;credits=100;updateStats();});
     updateStats();
   </script>
 </body>
