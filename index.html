@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CrimGamble — Criminology Meets Gaming Style</title>
+<link rel="stylesheet" href="css/styles.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-black text-white font-sans">
+
+<!-- Header -->
+<header class="p-6 flex justify-between items-center bg-gray-900 shadow-lg">
+  <h1 class="text-3xl font-bold text-neon-pink">CrimGamble</h1>
+  <nav>
+    <ul class="flex gap-6">
+      <li><a href="#theories" class="hover:text-neon-green transition">Theories</a></li>
+      <li><a href="#cases" class="hover:text-neon-blue transition">Cases</a></li>
+      <li><a href="#charts" class="hover:text-neon-yellow transition">Visuals</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 py-8">
+
+  <!-- Hero Section -->
+  <section id="hero" class="text-center mb-12">
+    <h2 class="text-4xl font-bold text-neon-blue mb-4">Explore Criminology Through Gaming Style</h2>
+    <p class="text-slate-300">Learn theories, case studies, and statistics in a casino-style interactive experience.</p>
+  </section>
+
+  <!-- Spin the Wheel -->
+  <section id="cases" class="mb-12 p-6 bg-gray-900 rounded-xl shadow-lg text-center">
+    <h3 class="text-2xl mb-4 text-neon-pink">Spin the Wheel for a Case Study</h3>
+    <button id="spinBtn" class="px-6 py-3 text-black font-bold rounded-lg bg-neon-green glow hover:scale-105 transition">SPIN</button>
+    <p id="caseOutput" class="mt-4 text-neon-yellow font-mono text-lg"></p>
+  </section>
+
+  <!-- Theories Cards -->
+  <section id="theories" class="mb-12">
+    <h3 class="text-2xl mb-6 text-neon-green">Criminology Theories</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-front p-6 bg-gray-800 rounded-xl shadow-lg text-center">
+            <h4 class="text-xl font-bold text-neon-blue">Strain Theory</h4>
+          </div>
+          <div class="card-back p-6 bg-gray-700 rounded-xl shadow-lg text-center">
+            <p class="text-slate-300">People engage in crime due to societal pressures and inability to achieve goals legally.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-front p-6 bg-gray-800 rounded-xl shadow-lg text-center">
+            <h4 class="text-xl font-bold text-neon-pink">Social Learning Theory</h4>
+          </div>
+          <div class="card-back p-6 bg-gray-700 rounded-xl shadow-lg text-center">
+            <p class="text-slate-300">Crime is learned behavior through observing others and social reinforcement.</p>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-front p-6 bg-gray-800 rounded-xl shadow-lg text-center">
+            <h4 class="text-xl font-bold text-neon-green">Routine Activities Theory</h4>
+          </div>
+          <div class="card-back p-6 bg-gray-700 rounded-xl shadow-lg text-center">
+            <p class="text-slate-300">Crime occurs when a motivated offender meets a suitable target without a capable guardian.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section id="charts" class="mb-12">
+    <h3 class="text-2xl mb-6 text-neon-yellow">Crime vs Gambling Stats</h3>
+    <canvas id="crimeChart" class="rounded-xl shadow-lg"></canvas>
+  </section>
+
+</main>
+
+<script src="js/interactive.js"></script>
+</body>
+</html>
